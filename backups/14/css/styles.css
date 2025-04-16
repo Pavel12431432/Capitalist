@@ -1,0 +1,1056 @@
+:root {
+    --font-main: "Georgia", serif;
+    --font-secondary: "Merriweather", serif;
+
+    --text-main: #333;
+    --text-light: #f7f7db;
+    --text-red: rgb(240, 91, 91);
+    --text-green: #38b000;
+
+    --bg-main: #969a83;
+    --bg-card-default: #f1ecd3;
+    --bg-sidebar-pattern: url("../assets/images/sidebar-pattern.png");
+    --bg-card-pattern: url("../assets/images/card-pattern.png");
+    --bg-card-pattern-rotated: url(../assets/images/card-pattern-rotated.png);
+
+    --border-dark: #383f2d;
+    --border-light: #aaa;
+
+    --chart-stock: #ff6384;
+    --chart-bond: #36a2eb;
+    --chart-savings: #ffce56;
+    --chart-index: #a0d995;
+    --chart-gold: #e2b0ff;
+    --chart-cash: #999999;
+    --chart-oil: #f4a261;
+
+    --progress-bar-bg: #2c2c2c;
+    --progress-fill-1: #b2ba3d;
+    --progress-fill-2: #90992f;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-main);
+    background: var(--bg-main);
+    background-image: var(--bg-card-pattern-rotated);
+    background-repeat: repeat;
+    background-size: 6%;
+    color: var(--border-dark);
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.top-sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.sidebar {
+    width: 30%;
+    height: 100vh;
+    overflow-y: auto; /* Optional: if it ever needs to scroll itself */
+    z-index: 10;
+    background-image: var(--bg-sidebar-pattern);
+    background-repeat: repeat;
+    background-size: 8rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 2px 0px 3px rgba(0, 0, 0, 0.6);
+}
+
+.year {
+    font-size: 1.5rem;
+    font-family: var(--font-main);
+    color: var(--text-light);
+    text-align: center;
+    margin-bottom: 0.3rem;
+}
+
+.year .small {
+    font-size: 1.2rem;
+}
+
+.year .big {
+    font-size: 2.4rem;
+    font-weight: bold;
+    margin: 0 0.2rem;
+}
+
+.stats {
+    margin-top: 3rem;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.stats h3 {
+    margin: 0.5rem 0 0.2rem;
+    font-size: 0.8rem;
+    color: #ccc;
+}
+
+.stats .value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--text-light);
+}
+
+.net-worth-bar {
+    height: 40px;
+    background-size: contain;
+    margin-top: 0.5rem;
+}
+
+/* Main content */
+.main {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+    padding: 2rem;
+}
+
+/* Cards */
+.card {
+    border-radius: 8px;
+    padding: 1.2rem;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.wide-card {
+    grid-column: span 3;
+}
+
+.card-header {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.card-body p {
+    margin: 0.3rem 0;
+}
+
+.card.stock-outline {
+    background: transparent;
+    border: 2px solid var(--border-dark);
+    border-radius: 4px;
+    box-shadow: none;
+}
+
+.card-chart {
+    height: 40px;
+    background: #ccc;
+    margin: 0.5rem 0;
+    border-radius: 4px;
+}
+
+.index-fund-card .card-chart {
+    height: 60px;
+    width: 80%;
+    align-self: center;
+    background: transparent;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+/* Stock Group */
+
+.card-group {
+    grid-column: span 6;
+    background-color: var(--bg-card-default); /* Same as savings-card */
+    background-image: var(--bg-card-pattern);
+    background-size: 200px;
+    background-repeat: repeat;
+    padding: 1rem;
+    border: 2px solid var(--border-dark);
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 var(--border-dark);
+    font-family: var(--font-main);
+    position: relative;
+}
+
+.card-group::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    border: 2px solid var(--border-dark);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.group-title {
+    font-size: 1rem;
+    font-weight: bold;
+    font-family: var(--font-main);
+    color: var(--border-dark);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding-bottom: 0.3rem;
+    margin-bottom: 0.8rem;
+}
+
+.stock-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    padding-bottom: 0; /* Add this */
+    margin-bottom: 0;
+}
+
+.stock-cards > .card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: transparent;
+    border: 2px solid var(--border-dark);
+    border-radius: 4px;
+    box-shadow: none;
+    padding: 0.6rem;
+    font-family: var(--font-main);
+}
+
+/* Text Colors */
+.text-red {
+    color: var(--text-red);
+}
+
+.text-green {
+    color: var(--text-green);
+}
+
+/* Leaderboard & Portfolio */
+.nav-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.leaderboard-section,
+.portfolio-section {
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.leaderboard-section h3,
+.portfolio-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-light);
+    text-align: center;
+}
+
+.leaderboard-section p,
+.portfolio-section p {
+    text-align: center;
+    font-size: 1rem;
+    margin: 0.3rem 0;
+    color: #ddd;
+}
+
+#portfolioChart {
+    display: block;
+    margin: 0 auto;
+}
+
+/* Vintage Progress Bar */
+.vintage-progress-bar {
+    position: relative;
+    width: 100%;
+    height: 18px;
+    background-color: var(--progress-bar-bg);
+    border: 2px solid var(--border-light);
+    border-radius: 5px;
+    padding: 2px;
+    box-shadow: inset 0 0 3px #000;
+    overflow: hidden;
+}
+
+.vintage-fill {
+    height: 100%;
+    width: 0%;
+    transition: width 0.2s ease-in-out;
+    background: var(--progress-fill-1);
+    /* background: repeating-linear-gradient(
+        to right,
+        var(--progress-fill-1),
+        var(--progress-fill-1) 8%,
+        var(--progress-fill-2) 8%,
+        var(--progress-fill-2) 16%
+    ); */
+    border-radius: 3px;
+}
+
+.bar-divider {
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    width: 4px;
+    background-color: var(--progress-bar-bg);
+    opacity: 0.9;
+    z-index: 2;
+}
+
+/* Special Savings Card */
+.savings-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-image: var(--bg-card-pattern);
+    background-repeat: repeat;
+    background-size: 200px;
+    background-color: var(--bg-card-default);
+    border: 2px solid var(--border-dark);
+    padding: 1rem;
+    border-radius: 4px;
+    font-family: var(--font-main);
+    text-align: center;
+    box-shadow: 3px 3px 0px var(--border-dark);
+    position: relative;
+}
+
+.savings-card::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    border: 2px solid var(--border-dark);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.savings-card .card-header {
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--border-dark);
+}
+
+.savings-card .card-icon {
+    font-size: 4rem;
+    color: var(--border-dark);
+}
+
+.card-icon-image {
+    width: 20%; /* match the emoji size */
+    height: auto;
+    object-fit: contain;
+    display: inline-block;
+    margin-top: 5%;
+}
+
+.card-balance {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    color: var(--border-dark);
+}
+
+.card-balance .label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.card-balance .amount {
+    font-size: 1.2rem;
+}
+
+.card-divider {
+    border-top: 2px dotted var(--border-dark);
+    margin-bottom: 0.2rem;
+}
+
+.card-actions {
+    margin-bottom: 0.2rem;
+    min-height: 50px;
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.shadow-button {
+    min-width: 100px;
+    height: 36px;
+    font-family: var(--font-main);
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: var(--border-dark);
+    background: transparent;
+    border: 1px solid var(--border-dark);
+    box-shadow: 3px 3px 0 var(--border-dark);
+    border-radius: 4px;
+    text-transform: lowercase;
+    padding: 0.4rem 1rem;
+    cursor: pointer;
+    transition: transform 0.05s ease, box-shadow 0.05s ease;
+}
+
+.shadow-button:hover {
+    background-color: rgba(59, 59, 59, 0.4);
+    transform: translateY(-2px);
+}
+
+.shadow-button.small {
+    padding: 0.25rem 0.6rem;
+    height: 30px;
+    font-size: 0.75rem;
+    min-width: auto;
+}
+
+.shadow-button.small.cancel {
+    padding: 0 0.4rem;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.shadow-button:active {
+    transform: translate(0px, 0px);
+    box-shadow: 0px 0px 0 var(--border-dark);
+}
+
+.input-wrapper {
+    position: relative;
+    display: inline-block;
+    height: 36px;
+}
+
+.savings-input {
+    width: 8rem;
+    height: 36px;
+    font-size: 0.8rem;
+    padding: 0 0.5rem;
+    font-family: var(--font-main);
+    background: transparent;
+    color: var(--border-dark);
+    border: 1px solid var(--border-dark);
+    border-radius: 4px;
+    box-shadow: 2px 2px 0 var(--border-dark);
+    margin-right: 0.4rem;
+    text-align: right;
+}
+
+/* Remove number input arrows in Chrome, Safari, Edge, Opera */
+.savings-input::-webkit-outer-spin-button,
+.savings-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Remove number input arrows in Firefox */
+.savings-input {
+    -moz-appearance: textfield;
+}
+
+.savings-input:focus {
+    outline: none;
+}
+
+.max-label {
+    line-height: 1; /* ADDED for better alignment */
+    height: 100%; /* Makes vertical centering more accurate */
+    display: flex; /* Ensures precise centering */
+    align-items: center; /* Vertically centers the text */
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.6rem;
+    font-family: var(--font-main);
+    color: var(--border-dark);
+    text-transform: uppercase;
+    cursor: pointer;
+    user-select: none;
+    pointer-events: all;
+}
+
+.max-label:hover {
+    text-decoration: underline;
+}
+
+.main > .card {
+    grid-column: span 2;
+}
+
+.main > .wide-card {
+    grid-column: span 3;
+}
+
+.main > .card-group {
+    grid-column: span 6;
+}
+
+/* Bonds Card Specific */
+.bonds-card .bond-charts {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 0.6rem 0;
+}
+
+.bond-input-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.bond-chart-wrapper {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.bond-pie {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: transparent;
+    cursor: default;
+    pointer-events: none;
+}
+
+.bond-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--border-dark);
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.1;
+    z-index: 10;
+}
+
+.bond-charts {
+    display: flex;
+    justify-content: center;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+    margin: 0.6rem 0;
+}
+
+.bond-chart {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at center,
+        var(--chart-bond) 50%,
+        #ccc 50%
+    );
+    border: 2px solid var(--border-dark);
+    font-family: var(--font-main);
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: var(--border-dark);
+    text-align: center;
+    line-height: 56px;
+    box-shadow: 2px 2px 0 var(--border-dark);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.bond-bob {
+    animation: bondBob 1s ease-in-out infinite alternate;
+}
+
+@keyframes bondBob {
+    0% {
+        transform: translateY(4px);
+    }
+    100% {
+        transform: translateY(-4px);
+    }
+}
+
+.stock-card {
+    color: var(--border-dark);
+    background: transparent;
+    border: 2px dashed var(--border-dark) !important;
+    box-shadow: none;
+    font-family: var(--font-main);
+    text-align: center;
+    box-shadow: none;
+    font-size: 0.8rem;
+    padding: 0.9rem 0.7rem;
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+
+.stock-header {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+    letter-spacing: 0.3px;
+}
+
+.stock-price {
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+    display: flex;
+    gap: 0.3rem;
+    margin-bottom: 0.2rem;
+}
+
+.stock-price.positive .price,
+.stock-price.positive .change {
+    color: var(--text-green);
+}
+
+.stock-price.negative .price,
+.stock-price.negative .change {
+    color: var(--text-red);
+}
+
+.stock-profit-label {
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-top: 0.6rem;
+    color: var(--border-dark);
+}
+
+.stock-profit-value {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--border-dark);
+    margin-bottom: 0.3rem;
+}
+
+.stock-chart-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+}
+
+.stock-content {
+    flex-grow: 3;
+}
+
+.stock-chart {
+    flex-grow: 1;
+    height: 48px;
+    width: 5rem;
+    background: transparent;
+    border-radius: 2px;
+}
+
+.shares-inline {
+    width: 5rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--border-dark);
+    white-space: nowrap;
+}
+
+.stock-actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.7rem;
+    margin-bottom: 0.3rem;
+}
+
+.shadow-button.small {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    margin: 0;
+    text-transform: lowercase;
+    box-shadow: 2px 2px 0 var(--border-dark);
+    margin-right: 0.4rem;
+}
+
+.text-button {
+    background: none;
+    border: none;
+    font-family: var(--font-main);
+    font-size: 0.75rem;
+    color: var(--border-dark);
+    text-transform: lowercase;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    align-self: center;
+}
+
+.text-button:hover {
+    text-decoration: underline;
+}
+
+.stock-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.7rem;
+    margin-top: 0.4rem;
+    gap: 1rem;
+}
+
+.stock-quantities {
+    display: flex;
+    gap: 0.6rem;
+    margin-right: 1rem;
+}
+
+.stock-quantities button {
+    background: transparent;
+    border: none;
+    font-family: var(--font-main);
+    font-size: 0.75rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+.oil-chart-stats-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0.6rem 0;
+    gap: 1rem;
+}
+
+.oil-chart {
+    flex-grow: 1;
+    height: 60px;
+    width: 50%;
+    background: transparent;
+    border-radius: 4px;
+}
+
+.oil-stats {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    color: var(--border-dark);
+}
+
+.oil-stats .label {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+}
+
+.oil-stats .value {
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: right;
+    min-width: 8rem; /* optional: makes values align consistently */
+}
+
+.oil-stats .stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline; /* optional: aligns value slightly lower than label */
+}
+
+.oil-price {
+    justify-content: center;
+    gap: 3rem;
+    font-size: 1.5rem;
+}
+
+.stock-quantities button.selected {
+    font-weight: bold;
+    text-decoration: underline;
+    font-size: 0.85rem;
+}
+
+.bond-options {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    margin: 0.6rem 0 0.3rem;
+}
+
+.bond-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #a0d995;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-main);
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: var(--border-dark);
+    border: 2px solid var(--border-dark);
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--border-dark);
+    user-select: none;
+    transition: transform 0.05s ease, box-shadow 0.05s ease;
+}
+
+.bond-circle.selected {
+    background: #fff;
+    text-decoration: underline;
+}
+
+.bond-circle:active {
+    transform: translate(0px, 0px);
+}
+
+.bond-circle:hover {
+    transform: translate(0px, -2px);
+}
+
+.bond-apy {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-bottom: 0.4rem;
+}
+
+/* === Event Popup === */
+#event-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    padding: 2rem;
+    border-radius: 8px;
+
+    max-width: 600px;
+    width: 100%;
+    z-index: 999;
+    display: none; /* make sure it's hidden by default */
+    text-align: center;
+    font-family: "Georgia", serif;
+}
+
+#event-popup.active {
+    display: block;
+}
+
+.event-content {
+    position: relative;
+    background-color: #393f32;
+    background-repeat: repeat;
+    padding: 2rem;
+    width: 100%;
+    border-radius: 4px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.9);
+    box-shadow: 3px 3px 0px var(--bg-card-default);
+    text-align: center;
+    border: 2px solid var(--bg-card-default);
+}
+
+.event-content::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    border: 2px solid var(--bg-card-default);
+    pointer-events: none;
+    z-index: 1;
+}
+
+#event-title {
+    font-family: "Georgia", serif;
+    text-transform: uppercase;
+    color: var(--text-light);
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+
+#event-description {
+    font-size: 1rem;
+    font-family: "Georgia", serif;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+    color: #f0ead2;
+}
+
+#event-actions button {
+    background-color: var(--bg-card-default);
+    color: #1d2b24;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-weight: bold;
+    text-transform: lowercase;
+    font-family: "Courier New", monospace;
+    box-shadow: 2px 2px 0 #888;
+    margin: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+#event-actions button:hover {
+    transform: translateY(-2px);
+}
+
+.event-payment {
+    background: var(--bg-card-default);
+    border: 2px solid rgba(0, 0, 0, 0.5);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
+    padding: 1rem;
+    margin: auto;
+    border-radius: 8px;
+    display: none;
+
+    /* display: flex; */
+    flex-direction: column;
+    align-items: center; /* ⬅️ centers items horizontally */
+    text-align: center; /* ⬅️ centers text inside <p> elements */
+    padding: 1rem;
+}
+
+.event-payment.show {
+    display: block;
+}
+
+.event-payment .event-message {
+    font-weight: bold;
+    color: var(--text-main);
+    margin-bottom: 0.25rem;
+    text-align: center;
+}
+
+.event-payment button {
+    background-color: #fa6a5f;
+    margin-top: 0.5rem;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.event-payment button:hover {
+    background-color: #fa483c;
+}
+
+#event-cost {
+    font-family: "Courier New", monospace;
+    font-size: 2rem;
+    color: #fdf6e3;
+    margin: 1rem 0;
+    border-top: 1px dotted #aaa;
+    border-bottom: 1px dotted #aaa;
+    padding: 1rem 0;
+}
+
+.event-cost {
+    font-size: 1.2rem; /* base size for label */
+}
+
+.event-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); /* adjust opacity as needed */
+    z-index: 998;
+    display: none;
+}
+.event-overlay.active {
+    display: block;
+}
+
+#notification-container {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+    pointer-events: none;
+}
+
+.notification {
+    background-color: #f5f1e3;
+    color: #1d2b24;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    padding: 0.6rem 2rem 0.6rem 1rem;
+    border: 2px solid var(--border-dark);
+    border-radius: 4px;
+    box-shadow: 2px 2px 0 var(--border-dark);
+    pointer-events: auto;
+    position: relative;
+    animation: fadeIn 0.2s ease-out;
+    min-width: 220px;
+    text-align: center;
+
+    transition: transform 0.3s ease, opacity 0.3s ease, max-height 0.3s ease,
+        margin 0.3s ease, padding 0.3s ease;
+    max-height: 200px; /* actual content height */
+    opacity: 1;
+    overflow: hidden;
+}
+
+.notification.success {
+    border-color: #4caf50;
+}
+
+.notification.error {
+    border-color: #e53935;
+}
+
+.notification.warning {
+    border-color: #fbc02d;
+}
+
+.notification .close-btn {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    cursor: pointer;
+    line-height: 1;
+    font-weight: bold;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.notification.slide-out {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+}

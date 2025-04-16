@@ -1,0 +1,124 @@
+<!-- Simple HTML test runner for GameAPI in browser -->
+<html>
+<head>
+  <title>GameAPI Browser Tests</title>
+  <style>
+    body { font-family: monospace; padding: 2rem; }
+    .pass { color: green; }
+    .fail { color: red; }
+  </style>
+</head>
+<body>
+  <h1>GameAPI Tests</h1>
+  <pre id="log"></pre>
+
+  <script type="module">
+    import { GameAPI } from './game_api.js';
+
+    const log = document.getElementById("log");
+    const print = (msg, pass = true) => {
+      const div = document.createElement("div");
+      div.textContent = (pass ? '✅' : '❌') + ' ' + msg;
+      div.className = pass ? 'pass' : 'fail';
+      log.appendChild(div);
+    };
+
+    const assert = (condition, msg) => {
+      if (!condition) throw new Error(msg);
+    };
+
+    const test = (name, fn) => {
+      try {
+        fn();
+        print(name);
+      } catch (e) {
+        print(name + ' → ' + e.message, false);
+      }
+    };
+
+    const runTests = () => {
+      const game = new GameAPI();
+
+      test("Gold buy/sell profit works", () => {
+        game.gold.price = 1800;
+        game.buyGold(1800);
+        const before = game.gold.ounces;
+        game.gold.price = 2000;
+        game.sellGold(1000);
+        assert(game.gold.ounces < before, "Gold ounces should decrease");
+        assert(game.getGoldProfit() > 0, "Gold profit should be positive");
+      });
+
+      test("Selling more gold than owned throws", () => {
+        game.gold.price = 1800;
+        let threw = false;
+        try {
+          game.sellGold(999999);
+        } catch {
+          threw = true;
+        }
+        assert(threw, "Should throw when overselling gold");
+      });
+
+      test("Stock buy/sell updates shares", () => {
+        game.buyStock("NEWWAVE TECH", 10);
+        assert(game.stocks["NEWWAVE TECH"].shares === 10);
+        game.sellStock("NEWWAVE TECH", 5);
+        assert(game.stocks["NEWWAVE TECH"].shares === 5);
+      });
+
+      test("Stock profit increases with price", () => {
+        game.buyStock("FIZZY DRINKS CO.", 10);
+        game.stocks["FIZZY DRINKS CO."].price += 10;
+        const profit = game.getLifetimeStockProfit("FIZZY DRINKS CO.");
+        assert(profit > 0, "Profit should be positive");
+      });
+
+      test("Bond maturity and redemption", () => {
+        game.buyBond(1000, 1);
+        game.currentQuarter = 4;
+        const value = game.calculateBondValue(game.bonds[0]);
+        assert(value > 1000, "Bond should grow");
+        game.redeemBond(0);
+        assert(game.bonds[0].redeemed === true);
+      });
+
+      test("Oil buy/sell profit works", () => {
+        const base = game.oil.price;
+        game.buyOil(10);
+        game.oil.price = base + 5;
+        game.sellOil(5);
+        assert(game.oil.barrels === 5);
+        assert(game.getOilProfit() > 0);
+      });
+
+      test("Index fund buy/sell adjusts shares and cash", () => {
+        const before = game.indexFund.shares;
+        game.buyIndexFund(1000);
+        assert(game.indexFund.shares > before);
+        game.sellIndexFund(500);
+        assert(game.cash > 0);
+      });
+
+      test("Advance quarter updates quarter and prices", () => {
+        game.gold.price = 1800;
+        game.indexFund.price = 2500;
+        game.advanceQuarter();
+        assert(game.currentQuarter === 1);
+      });
+
+      test("Withdraw more than savings throws", () => {
+        let threw = false;
+        try {
+          game.withdrawFromSavings(100);
+        } catch {
+          threw = true;
+        }
+        assert(threw);
+      });
+    };
+
+    runTests();
+  </script>
+</body>
+</html>

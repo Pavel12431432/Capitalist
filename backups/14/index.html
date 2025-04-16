@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Capitalist Game</title>
+        <link rel="stylesheet" href="css/styles.css" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="top-sidebar">
+                <div class="progress-container">
+                    <div class="year">
+                        <span class="small">YEAR</span>
+                        <span class="big" id="current-year">11</span>
+                        <span class="small">OF</span>
+                        <span class="big">20</span>
+                    </div>
+                    <div class="vintage-progress-bar">
+                        <div class="vintage-fill"></div>
+                        <div class="bar-divider" style="left: 25%"></div>
+                        <div class="bar-divider" style="left: 50%"></div>
+                        <div class="bar-divider" style="left: 75%"></div>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <h3>POCKET CASH</h3>
+                    <div class="value" id="cash-value">$6,054.20</div>
+
+                    <h3>OVERALL NET WORTH</h3>
+                    <div class="value" id="net-worth-value">$112,820.83</div>
+                    <div class="net-worth-bar"></div>
+                </div>
+
+                <div id="event-payment" class="event-payment hidden">
+                    <p class="event-message">
+                        Outstanding Payment: <span id="event-name-label"></span>
+                    </p>
+                    <p class="event-cost">
+                        $<span id="event-cost-label"></span>
+                    </p>
+                    <button class="shadow-button" id="pay-event-btn">
+                        Pay Now
+                    </button>
+                </div>
+            </div>
+
+            <div class="nav-sections">
+                <div class="leaderboard-section">
+                    <h3>Leaderboard</h3>
+                    <p>Player – <span id="player-value">$112,820.83</span></p>
+                    <p>
+                        Computer – <span id="computer-value">$107,300.00</span>
+                    </p>
+                </div>
+
+                <div class="portfolio-section">
+                    <h3>Portfolio</h3>
+                    <canvas
+                        id="portfolioChart"
+                        width="200"
+                        height="200"
+                    ></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN SECTION -->
+        <div class="main">
+            <!-- TOP ROW: 3 Separate Cards -->
+            <div class="card savings-card">
+                <div class="card-header">SAVINGS ACCOUNT</div>
+                <div class="card-icon">
+                    <img
+                        src="./assets/images/bank.png"
+                        alt="Bank Icon"
+                        class="card-icon-image"
+                    />
+                </div>
+                <div class="card-balance">
+                    <span class="label">BALANCE</span>
+                    <span class="amount" id="savings-value">$8,947.69</span>
+                </div>
+                <div class="card-divider"></div>
+                <div class="card-actions">
+                    <button class="shadow-button">withdraw</button>
+                    <button class="shadow-button">deposit</button>
+                </div>
+            </div>
+
+            <div class="card savings-card index-fund-card">
+                <div class="card-header">INDEX FUND</div>
+                <div class="card-chart">
+                    <canvas id="indexFundChartCanvas"></canvas>
+                </div>
+                <div class="card-balance">
+                    <span class="label">BALANCE</span>
+                    <span class="amount" id="index-fund-value">$8,781.62</span>
+                </div>
+                <div class="card-divider"></div>
+                <div class="card-actions">
+                    <button class="shadow-button">sell</button>
+                    <button class="shadow-button">buy</button>
+                </div>
+            </div>
+
+            <div class="card savings-card bonds-card">
+                <div class="card-header">GOVERNMENT BONDS</div>
+
+                <div class="bond-charts"></div>
+
+                <div class="card-balance bonds-balance">
+                    <span class="label">PROFIT</span>
+                    <span class="amount">$926.84</span>
+                </div>
+
+                <div class="card-divider"></div>
+
+                <div class="card-actions">
+                    <button class="shadow-button">buy</button>
+                </div>
+            </div>
+
+            <!-- MIDDLE ROW: Group of 4 Individual Stocks -->
+            <div class="card-group">
+                <div class="card-header group-title">INDIVIDUAL STOCKS</div>
+                <div class="stock-cards">
+                    <!-- 1 -->
+                    <div class="card stock-card">
+                        <div class="stock-content">
+                            <div class="stock-header">FIZZY DRINKS CO.</div>
+                            <div class="stock-price negative">
+                                <span class="price">$34.00</span>
+                                <span class="change">▼ -8.97%</span>
+                            </div>
+                            <div class="stock-profit-label">PROFIT</div>
+                            <div class="stock-profit-value">$2,718.84</div>
+                            <div class="stock-chart-row">
+                                <div class="stock-chart"></div>
+                                <div
+                                    class="shares-inline"
+                                    data-stock-name="FIZZY DRINKS CO."
+                                >
+                                    shares: 163
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stock-actions">
+                            <button class="shadow-button small">sell</button>
+                            <button class="shadow-button small">buy</button>
+                        </div>
+
+                        <div class="stock-footer">
+                            <div class="stock-quantities">
+                                <button>1</button><button>10</button
+                                ><button>25</button><button>MAX</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2 -->
+                    <div class="card stock-card">
+                        <div class="stock-content">
+                            <div class="stock-header">BIG BANK</div>
+                            <div class="stock-price negative">
+                                <span class="price">$732.20</span>
+                                <span class="change">▼ -2.45%</span>
+                            </div>
+                            <div class="stock-profit-label">PROFIT</div>
+                            <div class="stock-profit-value">$19,876.89</div>
+                            <div class="stock-chart-row">
+                                <div class="stock-chart"></div>
+                                <div
+                                    class="shares-inline"
+                                    data-stock-name="BIG BANK"
+                                >
+                                    shares: 31
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stock-actions">
+                            <button class="shadow-button small">sell</button>
+                            <button class="shadow-button small">buy</button>
+                        </div>
+
+                        <div class="stock-footer">
+                            <div class="stock-quantities">
+                                <button>1</button><button>10</button
+                                ><button>25</button><button>MAX</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3 -->
+                    <div class="card stock-card">
+                        <div class="stock-content">
+                            <div class="stock-header">HEALTHCORE LABS</div>
+                            <div class="stock-price negative">
+                                <span class="price">$67.10</span>
+                                <span class="change">▼ -9.64%</span>
+                            </div>
+                            <div class="stock-profit-label">PROFIT</div>
+                            <div class="stock-profit-value">$3,438.04</div>
+                            <div class="stock-chart-row">
+                                <div class="stock-chart"></div>
+                                <div
+                                    class="shares-inline"
+                                    data-stock-name="HEALTHCORE LABS"
+                                >
+                                    shares: 92
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stock-actions">
+                            <button class="shadow-button small">sell</button>
+                            <button class="shadow-button small">buy</button>
+                        </div>
+
+                        <div class="stock-footer">
+                            <div class="stock-quantities">
+                                <button>1</button><button>10</button
+                                ><button>25</button><button>MAX</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4 -->
+                    <div class="card stock-card">
+                        <div class="stock-content">
+                            <div class="stock-header">NEWWAVE TECH</div>
+                            <div class="stock-price positive">
+                                <span class="price">$3.49</span>
+                                <span class="change">▲ 9.17%</span>
+                            </div>
+
+                            <div class="stock-profit-label">PROFIT</div>
+                            <div class="stock-profit-value">$358.30</div>
+                            <div class="stock-chart-row">
+                                <div class="stock-chart"></div>
+                                <div
+                                    class="shares-inline"
+                                    data-stock-name="NEWWAVE TECH"
+                                >
+                                    shares: 2134
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stock-actions">
+                            <button class="shadow-button small">sell</button>
+                            <button class="shadow-button small">buy</button>
+                        </div>
+
+                        <div class="stock-footer">
+                            <div class="stock-quantities">
+                                <button>1</button><button>10</button
+                                ><button>25</button><button>MAX</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTTOM ROW: 2 Separate Cards -->
+            <div class="card savings-card wide-card">
+                <div class="stock-header">OIL</div>
+
+                <div class="stock-price oil-price positive">
+                    <span class="price">$4.00</span>
+                    <span class="change">▲ 8.25%</span>
+                </div>
+
+                <!-- Chart & Stats Row -->
+                <div class="oil-chart-stats-row">
+                    <div class="oil-chart">
+                        <canvas id="oilChartCanvas"></canvas>
+                    </div>
+                    <div class="oil-stats">
+                        <div class="stat">
+                            <span class="label">Profit</span>
+                            <span class="value">-$871.33</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Balance</span>
+                            <span class="value" id="oil-balance"
+                                >$4,712.50</span
+                            >
+                        </div>
+                        <div class="stat">
+                            <div class="label">BARRELS</div>
+                            <div class="value" id="oil-barrels">1178</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stock-footer">
+                    <div class="stock-quantities">
+                        <button>1</button><button>10</button><button>25</button
+                        ><button>MAX</button>
+                    </div>
+                    <div class="stock-actions">
+                        <button class="shadow-button small">sell</button>
+                        <button class="shadow-button small">buy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card savings-card wide-card">
+                <div class="stock-header">GOLD</div>
+
+                <div class="stock-price oil-price positive">
+                    <span class="price">$89.50</span>
+                    <span class="change">▲ 4.32%</span>
+                </div>
+
+                <!-- Chart & Stats Row -->
+                <div class="oil-chart-stats-row">
+                    <div class="oil-chart">
+                        <canvas id="goldChartCanvas"></canvas>
+                    </div>
+                    <div class="oil-stats">
+                        <div class="stat">
+                            <span class="label">Profit</span>
+                            <span class="value">1,154.20</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Balance</span>
+                            <span class="value" id="gold-balance"
+                                >$7,498.91</span
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stock-footer">
+                    <div class="stock-actions">
+                        <button class="shadow-button">sell</button>
+                        <button class="shadow-button">buy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="module" src="js/main.js"></script>
+        <script type="module" src="js/event_manager.js"></script>
+
+        <div id="overlay" class="event-overlay"></div>
+
+        <!-- EVENT POPUP -->
+        <div id="event-popup" class="event-popup">
+            <div class="event-content">
+                <div class="event-title" id="event-title">Event Title</div>
+                <div class="event-description" id="event-description">
+                    This is a description of the event.
+                </div>
+                <div id="event-cost">$2,500.00</div>
+                <div class="event-actions" id="event-actions">
+                    <!-- Buttons will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <div id="notification-container"></div>
+    </body>
+</html>
