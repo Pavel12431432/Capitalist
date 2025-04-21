@@ -395,7 +395,6 @@ body {
     border: 1px solid var(--border-dark);
     box-shadow: 3px 3px 0 var(--border-dark);
     border-radius: 4px;
-    text-transform: lowercase;
     padding: 0.4rem 1rem;
     cursor: pointer;
     transition: transform 0.05s ease, box-shadow 0.05s ease;
@@ -404,13 +403,18 @@ body {
 .shadow-button:hover {
     background-color: rgba(59, 59, 59, 0.4);
     transform: translateY(-2px);
+    box-shadow: 6px 6px 0 var(--border-dark);
 }
 
 .shadow-button.small {
-    padding: 0.25rem 0.6rem;
-    height: 30px;
     font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    margin: 0;
+    height: 30px;
     min-width: auto;
+    /* text-transform: lowercase; */
+    box-shadow: 2px 2px 0 var(--border-dark);
+    margin-right: 0.4rem;
 }
 
 .shadow-button.small.cancel {
@@ -419,8 +423,17 @@ body {
     line-height: 1;
 }
 
+.shadow-button.small:hover {
+    box-shadow: 4px 4px 0 var(--border-dark);
+}
+
 .shadow-button:active {
-    transform: translate(0px, 0px);
+    transform: translate(3px, 3px);
+    box-shadow: 0px 0px 0 var(--border-dark);
+}
+
+.shadow-button.small:active {
+    transform: translate(2px, 2px);
     box-shadow: 0px 0px 0 var(--border-dark);
 }
 
@@ -675,15 +688,6 @@ body {
     margin-bottom: 0.3rem;
 }
 
-.shadow-button.small {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.6rem;
-    margin: 0;
-    text-transform: lowercase;
-    box-shadow: 2px 2px 0 var(--border-dark);
-    margin-right: 0.4rem;
-}
-
 .text-button {
     background: none;
     border: none;
@@ -827,7 +831,7 @@ body {
 }
 
 /* === Event Popup === */
-#event-popup {
+.event-popup {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -844,7 +848,7 @@ body {
     font-family: "Georgia", serif;
 }
 
-#event-popup.active {
+.event-popup.active {
     display: block;
 }
 
@@ -873,7 +877,7 @@ body {
     z-index: 1;
 }
 
-#event-title {
+.event-title {
     font-family: "Georgia", serif;
     text-transform: uppercase;
     color: var(--text-light);
@@ -883,7 +887,7 @@ body {
     letter-spacing: 1px;
 }
 
-#event-description {
+.event-description {
     font-size: 1rem;
     font-family: "Georgia", serif;
     line-height: 1.5;
@@ -891,7 +895,9 @@ body {
     color: #f0ead2;
 }
 
-#event-actions button {
+.event-popup .event-actions button,
+#help-popup .event-actions button,
+#pause-popup .event-actions button {
     background-color: var(--bg-card-default);
     color: #1d2b24;
     border: none;
@@ -905,8 +911,17 @@ body {
     transition: transform 0.1s ease;
 }
 
-#event-actions button:hover {
-    transform: translateY(-2px);
+.event-popup .event-actions button:hover,
+#help-popup .event-actions button:hover,
+#pause-popup .event-actions button:hover {
+    box-shadow: 4px 4px 0 #888;
+}
+
+.event-popup .event-actions button:active,
+#help-popup .event-actions button:active,
+#pause-popup .event-actions button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0;
 }
 
 .event-payment {
@@ -920,8 +935,8 @@ body {
 
     /* display: flex; */
     flex-direction: column;
-    align-items: center; /* ⬅️ centers items horizontally */
-    text-align: center; /* ⬅️ centers text inside <p> elements */
+    align-items: center; /* centers items horizontally */
+    text-align: center; /* centers text inside <p> elements */
     padding: 1rem;
 }
 
@@ -1055,26 +1070,7 @@ body {
     padding: 0;
 }
 
-#start-screen,
-#end-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: #1a1a1a;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-}
-
-#end-stats {
-    margin-top: 20px;
-    font-size: 1.2rem;
-}
+/* Start and end screen */
 
 .game-instructions {
     max-width: 600px;
@@ -1101,28 +1097,28 @@ body {
 .start-btn:hover {
     background-color: #6bdb86;
     color: var(--text-main);
-    box-shadow: 2px 2px 0 var(--bg-card-default),
+    box-shadow: 4px 4px 0 var(--bg-card-default),
         0 0 16px rgba(107, 219, 134, 0.4); /* subtle glow */
 }
 
-#start-screen {
-    /* background: linear-gradient(160deg, #393f32, #121311); */
-
+.screen {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-
-    background-color: #393f32;
-
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='96' viewBox='0 0 60 96'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%235d7048' fill-opacity='0.4'%3E%3Cpath d='M36 10a6 6 0 0 1 12 0v12a6 6 0 0 1-6 6 6 6 0 0 0-6 6 6 6 0 0 1-12 0 6 6 0 0 0-6-6 6 6 0 0 1-6-6V10a6 6 0 1 1 12 0 6 6 0 0 0 12 0zm24 78a6 6 0 0 1-6-6 6 6 0 0 0-6-6 6 6 0 0 1-6-6V58a6 6 0 1 1 12 0 6 6 0 0 0 6 6v24zM0 88V64a6 6 0 0 0 6-6 6 6 0 0 1 12 0v12a6 6 0 0 1-6 6 6 6 0 0 0-6 6 6 6 0 0 1-6 6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
+    background-color: #393f32;
     padding: 40px 20px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='96' viewBox='0 0 60 96'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%235d7048' fill-opacity='0.4'%3E%3Cpath d='M36 10a6 6 0 0 1 12 0v12a6 6 0 0 1-6 6 6 6 0 0 0-6 6 6 6 0 0 1-12 0 6 6 0 0 0-6-6 6 6 0 0 1-6-6V10a6 6 0 1 1 12 0 6 6 0 0 0 12 0zm24 78a6 6 0 0 1-6-6 6 6 0 0 0-6-6 6 6 0 0 1-6-6V58a6 6 0 1 1 12 0 6 6 0 0 0 6 6v24zM0 88V64a6 6 0 0 0 6-6 6 6 0 0 1 12 0v12a6 6 0 0 1-6 6 6 6 0 0 0-6 6 6 6 0 0 1-6 6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     z-index: 999;
+}
+
+.screen.hidden {
+    display: none;
 }
 
 .start-screen-wrapper {
@@ -1203,4 +1199,48 @@ body {
 .start-footer a:hover {
     text-decoration: underline;
     color: #6bdb86;
+}
+
+.end-screen-wrapper {
+    animation: popIn 0.6s ease forwards;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 40px;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    color: var(--text-light);
+    text-align: center;
+}
+
+.end-stats p {
+    font-size: 1rem;
+    line-height: 1.4;
+    margin: 8px 0;
+}
+
+.end-description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0 0 20px;
+    color: var(--text-light);
+    text-align: center;
+}
+
+.sidebar-help {
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.sidebar-help .shadow-button {
+    background-color: var(--bg-card-default);
+    color: var(--border-dark);
+    border-color: var(--border-dark);
+}
+
+.sidebar-help .shadow-button:hover {
+    background-color: #e0e0c0; /* a slightly darker tint */
+    color: var(--text-main);
 }

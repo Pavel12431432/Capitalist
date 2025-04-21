@@ -2,7 +2,6 @@
 import { getHistoricalPrice } from "./data_manager.js";
 import { eventManager } from "./event_manager.js";
 import { showNotification } from "./notification_system.js";
-import { pauseTime } from "./time_manager.js";
 
 export class GameAPI {
     constructor() {
@@ -104,8 +103,8 @@ export class GameAPI {
     getLifetimeStockProfit(name) {
         const stock = this.stocks[name];
         const unrealized = stock.shares * stock.price - stock.totalCost;
-        return (
-            this.roundMoney(this.stockLifetimeProfit[name] + (stock.shares > 0 ? unrealized : 0))
+        return this.roundMoney(
+            this.stockLifetimeProfit[name] + (stock.shares > 0 ? unrealized : 0)
         );
     }
 
@@ -316,31 +315,41 @@ export class GameAPI {
     }
 
     advanceQuarter() {
+        // 1) Don’t advance if there’s still an open event
         if (eventManager.hasUnresolvedEvent()) {
-            showNotification("You must resolve the event before continuing!", "error");
+            showNotification(
+                "You must resolve the event before continuing!",
+                "error"
+            );
             return;
         }
-        if (this.currentQuarter == 79) {
+
+        // 2) End‑of‑game?
+        if (this.currentQuarter === 79) {
             showEndScreen();
-            pauseTime();
-            return
+            setTrigger(true); // lock everything down
+            return;
         }
 
+        // 3) Actually bump the quarter
         this.currentQuarter++;
 
+        // 4) Annual bonus every 4 quarters
         if (this.currentQuarter % 4 === 0) {
             this.setCash(this.cash + 10000);
-            computer.setCash(computer.cash + 10000)
+            computer.setCash(computer.cash + 10000);
             this.savings = this.roundMoney(this.savings * 1.01);
             showNotification("Earned $10,000.00!", "success");
         }
 
+        // 5) Refresh prices for both players
         this.updatePrices();
         computer.updatePrices(this.gold.price, this.indexFund.price);
-        if (this.currentQuarter == 1)
+
+        // 6) Seed computer at quarter 1
+        if (this.currentQuarter === 1) {
             computer.setCash(10000);
-        if (this.currentQuarter != 1)
-            eventManager.tryTriggerRandomEvent(this);
+        }
     }
 
     getCurrentYear() {

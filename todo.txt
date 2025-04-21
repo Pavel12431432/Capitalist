@@ -1,5 +1,4 @@
-end menu
 allow redeeming bonds early
-help screen
 
 ?add more data
+?scale down for smaller screens

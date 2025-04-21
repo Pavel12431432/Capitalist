@@ -5,7 +5,10 @@ const EVENT_PROBABILITY = 0.05;
 export const eventManager = {
     activeEvent: null,
     triggered: false,
+    testedThisQuarter: false,
     showPaymentUI: false,
+
+    eventCashFlow: 0,
 
     eventPool: [
         {
@@ -57,6 +60,7 @@ export const eventManager = {
             name: "Mysterious Donor",
             description: "An anonymous person sent you $5,000.",
             type: "positive",
+            cash: 5000,
             message: "$5,000.00",
             effect(game) {
                 game.setCash(game.cash + 5000);
@@ -79,6 +83,7 @@ export const eventManager = {
             name: "Unexpected Inheritance",
             description: "A distant relative passed away and left you $8,000.",
             type: "positive",
+            cash: 8000,
             message: "$8,000.00",
             effect(game) {
                 game.setCash(game.cash + 8000);
@@ -100,6 +105,7 @@ export const eventManager = {
             name: "Bank Bonus",
             description: "Your bank rewarded you with a $1,500 loyalty bonus.",
             type: "positive",
+            cash: 1500,
             message: "$1,500.00",
             effect(game) {
                 game.setCash(game.cash + 1500);
@@ -111,6 +117,7 @@ export const eventManager = {
             description:
                 "Your landlord gave you a one-month rent break. You saved $2,500.",
             type: "positive",
+            cash: 2500,
             message: "$2,500.00",
             effect(game) {
                 game.setCash(game.cash + 2500);
@@ -133,6 +140,7 @@ export const eventManager = {
             name: "Work Bonus",
             description: "You received a bonus of $3,500!",
             type: "positive",
+            cash: 3500,
             message: "$3,500.00",
             effect(game) {
                 game.setCash(game.cash + 3500);
@@ -220,26 +228,34 @@ export const eventManager = {
     ],
 
     tryTriggerRandomEvent(game) {
-        const validEvents = this.eventPool.filter((event) => {
-            if (event.type === "negative" && event.cost) {
-                return 2 * event.cost <= game.getNetWorth();
+        // 0) Only test once per quarter
+        if (this.testedThisQuarter) {
+            return false;
+        }
+        this.testedThisQuarter = true;
+
+        // 1) Build valid pool
+        const valid = this.eventPool.filter((e) => {
+            if (e.type === "negative" && e.cost) {
+                return 2 * e.cost <= game.getNetWorth();
             }
             return true;
         });
 
-        if (validEvents.length === 0 || Math.random() >= EVENT_PROBABILITY) {
-            this.activeEvent = null;
-            this.triggered = false;
-            setTrigger(false);
-            return;
+        // 2) Roll
+        if (valid.length === 0 || Math.random() >= EVENT_PROBABILITY) {
+            return false;
         }
 
-        const event = validEvents[Math.floor(Math.random() * validEvents.length)];
-        // const event = this.eventPool[4];
-        this.activeEvent = event;
+        // 3) Pick one, pause, show it
+        const evt = valid[Math.floor(Math.random() * valid.length)];
+
+        setTrigger(true); // pause the clock
+        this.activeEvent = evt;
         this.triggered = true;
-        setTrigger(true);
-        this.showEventPopup(event, game);
+        this.showEventPopup(evt, game);
+
+        return true;
     },
 
     getRandomEvent() {
@@ -290,8 +306,10 @@ export const eventManager = {
             accept.classList.add("shadow-button");
             accept.onclick = () => {
                 event.effect(game);
-                if (event.id != "startup_success")
+                if (event.id != "startup_success") {
                     event.effect(computer);
+                    eventManager.eventCashFlow += event.cash || 0;
+                }
                 popup.classList.remove("active");
                 this.activeEvent = null;
                 this.triggered = false;
@@ -308,6 +326,7 @@ export const eventManager = {
                 if (game.cash >= event.cost) {
                     event.effect(game);
                     event.effect(computer);
+                    eventManager.eventCashFlow -= event.cost || 0;
                     popup.classList.remove("active");
                     this.activeEvent = null;
                     this.triggered = false;
@@ -343,7 +362,9 @@ export const eventManager = {
                 btn.className = "accept";
                 btn.onclick = () => {
                     choice.action(game, this);
-                    this.disableOverlay();
+                    if (!this.triggered) {
+                        this.disableOverlay();
+                    }
                     updateUI();
                 };
                 btn.classList.add("shadow-button");

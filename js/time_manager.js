@@ -1,51 +1,85 @@
-let gameIntervalId = null;
+let quarterStartTime = 0;
 let progressIntervalId = null;
-let quarterStartTime = null;
+let quarterTimeoutId = null;
+let paused = false;
+let elapsedAtPause = 0;
 
-let eventPaused = false;
+const tickTime = 10_000;
 
-const tickTime = 6000; // 10 seconds
+// Called once game is allowed to tick into the next quarter
+function onQuarterEnd() {
+    // If an event is still open, do nothing
+    if (eventManager.hasUnresolvedEvent()) return;
 
+    // Try a random event (will only test once)
+    if (eventManager.tryTriggerRandomEvent(window.game)) {
+        return;
+    }
+
+    // No event → advance and begin next quarter
+    window.game.advanceQuarter();
+    window.updateUI();
+    startTime();
+}
+
+/**
+ * Start a brand‑new quarter: reset the "tested" flag, set up timers.
+ */
 export function startTime() {
+    // Reset event testing
+    eventManager.testedThisQuarter = false;
+
+    // Clear any old timers
+    clearInterval(progressIntervalId);
+    clearTimeout(quarterTimeoutId);
+
+    paused = false;
+    elapsedAtPause = 0;
     quarterStartTime = Date.now();
 
-    // Progress bar updater: runs every 100ms
-    progressIntervalId = setInterval(() => {
-        updateProgressBar();
-    }, 100);
+    // Smooth bar updates
+    progressIntervalId = setInterval(updateProgressBar, 100);
 
-    // Game quarter tick every 10 seconds
-    gameIntervalId = setInterval(() => {
-        game.advanceQuarter();
-        updateUI();
-        quarterStartTime = Date.now(); // reset timer
-    }, tickTime);
+    // Schedule the quarter‐end driver
+    quarterTimeoutId = setTimeout(onQuarterEnd, tickTime);
 }
 
-export function pauseTime() {
-    clearInterval(gameIntervalId);
-    clearInterval(progressIntervalId);
-}
+/**
+ * Pause or resume everything.
+ */
+export function setTrigger(shouldPause) {
+    if (shouldPause && !paused) {
+        // PAUSE: record elapsed and clear timers
+        paused = true;
+        elapsedAtPause = Math.min(Date.now() - quarterStartTime, tickTime);
+        clearInterval(progressIntervalId);
+        clearTimeout(quarterTimeoutId);
+    } else if (!shouldPause && paused) {
+        // RESUME:
+        paused = false;
+        const remaining = tickTime - elapsedAtPause;
 
-export function resumeTime() {
-    startTime(); // restarts both timers
-}
-
-function updateProgressBar() {
-    const elapsed = Date.now() - quarterStartTime;
-    const quarter = eventPaused ? game.currentQuarter - 1 : game.currentQuarter;
-
-    const percent = 25 * (quarter % 4) + Math.min((elapsed / (4 * tickTime)) * 100, 100);
-    updateYearProgress(percent);
-}
-
-export function setTrigger(state) {
-    if (state != eventPaused) {
-        if (state) {
-            pauseTime();
-        } else {
-            resumeTime();
+        // If we were right at the boundary, fire onQuarterEnd immediately
+        if (remaining <= 0) {
+            return onQuarterEnd();
         }
+
+        // Else resume mid‑quarter
+        quarterStartTime = Date.now() - elapsedAtPause;
+        progressIntervalId = setInterval(updateProgressBar, 100);
+        quarterTimeoutId = setTimeout(onQuarterEnd, remaining);
     }
-    eventPaused = state;
+}
+
+/**
+ * Updates the progress bar every 100ms when not paused.
+ */
+export function updateProgressBar() {
+    if (paused) return;
+
+    const elapsed = Date.now() - quarterStartTime;
+    const frac = Math.min(Math.max(elapsed / tickTime, 0), 1);
+    const subQ = window.game.currentQuarter % 4;
+    const pct = (subQ + frac) * 25;
+    window.updateYearProgress(pct);
 }

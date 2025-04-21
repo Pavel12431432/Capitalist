@@ -13,7 +13,7 @@
     </head>
     <body>
         <!-- START SCREEN -->
-        <div id="start-screen">
+        <div id="start-screen" class="screen">
             <div class="start-screen-wrapper">
                 <div class="game-instructions">
                     <h2>Welcome to Capitalist!</h2>
@@ -49,22 +49,106 @@
                         journey.
                     </p>
                 </div>
-
                 <button class="shadow-button start-btn" onclick="startGame()">
                     Play
                 </button>
             </div>
 
             <footer class="start-footer">
-                Created as part of a Civil Education project
-                <!-- <a href="https://yourwebsite.com" target="_blank">Your Name</a> -->
+                Created as part of a Civil Education project at
+                <a href="https://smg.bg/" target="_blank">SMG</a>
             </footer>
         </div>
 
         <!-- END SCREEN -->
-        <div id="end-screen" style="display: none">
-            <h1>Game Over</h1>
-            <div id="end-stats"></div>
+        <div id="end-screen" class="screen hidden">
+            <div class="end-screen-wrapper">
+                <h1>Game Over</h1>
+
+                <!-- NEW: explanatory text -->
+                <p class="end-description">
+                    This simulation runs on real historical market data from
+                    1997 to 2017.<br />
+                    The computer opponent automatically invests 80% of its cash
+                    in an index fund and 20% in government bonds every quarter.
+                </p>
+
+                <div id="end-stats" class="end-stats">
+                    <!-- JS will inject:
+          <p>Your Final Net Worth: …</p>
+          <p>Computer's Final Net Worth: …</p>
+          <p>Net Money Earned: …</p>
+          <p>Trades Made: …</p>
+        -->
+                </div>
+
+                <button
+                    class="shadow-button start-btn"
+                    onclick="location.reload()"
+                >
+                    Play Again
+                </button>
+            </div>
+            <footer class="start-footer">
+                Created as part of a Civil Education project at
+                <a href="https://smg.bg/" target="_blank">SMG</a>
+            </footer>
+        </div>
+
+        <!-- HELP POPUP (hidden by default) -->
+        <div id="help-popup" class="event-popup">
+            <div class="event-content">
+                <div class="event-title">Instrument Guide</div>
+                <div class="event-description">
+                    <ul
+                        style="
+                            text-align: left;
+                            margin: 0;
+                            padding-left: 1rem;
+                            line-height: 1.5;
+                        "
+                    >
+                        <li>
+                            <strong>Stocks</strong>: Buy shares of individual
+                            companies; profit/loss realized when you sell vs.
+                            purchase price.
+                        </li>
+                        <li>
+                            <strong>Index Fund</strong>: A diversified basket;
+                            low‑cost, passive growth.
+                        </li>
+                        <li>
+                            <strong>Bonds</strong>: Lock cash for 1–5 years at
+                            fixed APY; redeem principal + interest at maturity.
+                        </li>
+                        <li>
+                            <strong>Gold &amp; Oil</strong>: Commodities whose
+                            prices fluctuate—good for diversification or
+                            trading.
+                        </li>
+                        <li>
+                            <strong>Savings</strong>: Zero risk, pays 1%
+                            interest annually; ideal for emergency cash.
+                        </li>
+                    </ul>
+                </div>
+                <div id="help-actions" class="event-actions">
+                    <button class="accept shadow-button">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAUSE POPUP (hidden by default) -->
+        <div id="pause-popup" class="event-popup">
+            <div class="event-content">
+                <div class="event-title">Paused</div>
+                <div class="event-description">
+                    Game is paused. Click Resume to continue.
+                </div>
+                <div id="pause-actions" class="event-actions">
+                    <button class="accept shadow-button">Resume</button>
+                </div>
+            </div>
         </div>
 
         <!-- SIDEBAR -->
@@ -124,6 +208,13 @@
                         height="200"
                     ></canvas>
                 </div>
+            </div>
+
+            <div class="sidebar-help">
+                <button id="help-btn" class="shadow-button small">Help</button>
+                <button id="pause-btn" class="shadow-button small">
+                    Pause
+                </button>
             </div>
         </div>
 

@@ -2,12 +2,7 @@ import { GameAPI } from "./game_api.js";
 import { eventManager } from "./event_manager.js";
 import { showNotification } from "./notification_system.js";
 import { ComputerPlayer } from "./computer_player.js";
-import {
-    startTime,
-    pauseTime,
-    resumeTime,
-    setTrigger,
-} from "./time_manager.js";
+import { startTime, setTrigger, updateProgressBar } from "./time_manager.js";
 import {
     loadAllHistoricalData,
     historicalData,
@@ -20,9 +15,8 @@ import {
 
 let portfolioChart = null;
 
-let gameIntervalId = null;
-let progressIntervalId = null;
-let quarterStartTime = null;
+// stats
+let tradeCount = 0;
 
 function initPortfolioChart() {
     if (portfolioChart) {
@@ -135,17 +129,36 @@ function createGameWithAutoUI(GameAPIClass, updateCallback) {
         // Add others as needed
     ];
 
+    const tradingMethods = [
+        "buyStock",
+        "sellStock",
+        "buyGold",
+        "sellGold",
+        "buyIndexFund",
+        "sellIndexFund",
+        "buyOil",
+        "sellOil",
+    ];
+
     return new Proxy(instance, {
         get(target, prop) {
-            const value = target[prop];
-            if (typeof value === "function" && mutatingMethods.includes(prop)) {
+            const orig = target[prop];
+            if (typeof orig === "function" && mutatingMethods.includes(prop)) {
                 return function (...args) {
-                    const result = value.apply(target, args);
-                    updateCallback();
-                    return result;
+                    try {
+                        const result = orig.apply(target, args); // ← run the real method
+                        if (tradingMethods.includes(prop)) {
+                            tradeCount++; // ← only increment on success
+                        }
+                        updateCallback();
+                        return result;
+                    } catch (err) {
+                        // no tradeCount++ here, just re‑throw
+                        throw err;
+                    }
                 };
             }
-            return value;
+            return orig;
         },
     });
 }
@@ -264,7 +277,6 @@ function createInputFlow({
         cancelBtn.remove();
         wrapper.remove();
         siblingButton.style.display = "inline-block";
-        button.style.transform = "none";
         inputActive = false;
     }
 }
@@ -637,14 +649,23 @@ function updateEventPaymentUI(game) {
 
         payBtn.onclick = () => {
             if (game.cash >= event.cost) {
+                // 1) apply the payment
                 event.effect(game);
                 event.effect(computer);
+                eventManager.eventCashFlow -= event.cost || 0;
+
+                // 2) clear the event state
                 eventManager.activeEvent = null;
                 eventManager.triggered = false;
-                eventBox.classList.remove("show");
                 eventManager.showPaymentUI = false;
-                resumeTime();
-                updateUI(); // refresh everything
+                eventBox.classList.remove("show");
+
+                // 3) restart the quarter timer from where you left off
+                setTrigger(false);
+                startTime();
+
+                // 4) refresh everything
+                updateUI();
             } else {
                 showNotification("You don't have enough cash.", "error");
             }
@@ -662,8 +683,6 @@ function updateUI() {
     const quarter = state.currentQuarter ?? 0;
     const year = Math.floor(quarter / 4) + 1;
     document.querySelector(".year .big").textContent = year;
-    const quarterInYear = quarter % 4; // 0 to 3
-    const percentFilled = ((4 - quarterInYear) / 4) * 100; // goes from 100 → 0
 
     // Sidebar
     document.getElementById("cash-value").textContent = formatCurrency(
@@ -821,9 +840,8 @@ const computer = new ComputerPlayer();
 window.computer = computer;
 window.game = game;
 
-window.pauseTime = pauseTime;
-window.resumeTime = resumeTime;
 window.setTrigger = setTrigger;
+window.startTime = startTime;
 
 window.showNotification = showNotification;
 window.updateYearProgress = updateYearProgress;
@@ -831,7 +849,11 @@ window.eventManager = eventManager;
 
 function startGame() {
     const startScreen = document.getElementById("start-screen");
+    document.getElementById("end-screen").classList.add("hidden");
+    startScreen.classList.remove("hidden");
     startScreen.classList.add("fade-out");
+
+    tradeCount = 0;
 
     // Wait for animation to finish before hiding completely or starting game logic
     setTimeout(() => {
@@ -839,20 +861,39 @@ function startGame() {
         // Insert your actual game-starting logic here if needed
     }, 600); // duration matches CSS animation
     startTime();
-
-    // remove
-    pauseTime();
-    showEndScreen();
 }
 
-function showEndScreen(stats) {
-    document.getElementById("end-screen").style.display = "flex";
+function showEndScreen() {
+    const end = document.getElementById("end-screen");
+    end.classList.remove("hidden");
+
     const statsDiv = document.getElementById("end-stats");
+
+    const playerNet = game.getNetWorth();
+    const computerNet = computer.getNetWorth();
+    const cashOnlyEarned = 20 * 10000 + eventManager.eventCashFlow;
+
     statsDiv.innerHTML = `
-      <p>Time Played: ${123} seconds</p>
-      <p>Score: ${543}</p>
-      <p>Trades Made: ${111}</p>
-    `;
+    <p>Your Final Net Worth: $${playerNet.toLocaleString()}</p>
+    <p>Computer's Final Net Worth: $${computerNet.toLocaleString()}</p>
+    <p>“Cash‑only” Money Earned: $${cashOnlyEarned.toLocaleString()}</p>
+    <p>Trades Made: ${tradeCount}</p>
+  `;
+}
+
+// helper to show any of these popups + pause the clock
+function showDialog(popupId, actionBtnSelector, onClose) {
+    setTrigger(true);
+    document.getElementById("overlay").classList.add("active");
+    const popup = document.getElementById(popupId);
+    popup.classList.add("active");
+
+    popup.querySelector(actionBtnSelector).onclick = () => {
+        popup.classList.remove("active");
+        document.getElementById("overlay").classList.remove("active");
+        setTrigger(false);
+        if (onClose) onClose();
+    };
 }
 
 window.startGame = startGame;
@@ -865,7 +906,6 @@ window.showEndScreen = showEndScreen;
 document.addEventListener("DOMContentLoaded", async () => {
     await loadAllHistoricalData();
     game.updatePrices();
-    updateYearProgress(25);
 
     // Expose to console
     window.historicalData = historicalData;
@@ -874,6 +914,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const ctx = document.getElementById("portfolioChart").getContext("2d");
     initPortfolioChart();
     updateUI();
+
+    // Show Help
+    document.getElementById("help-btn").onclick = () => {
+        showDialog("help-popup", "#help-actions button");
+    };
+
+    // Show Pause
+    document.getElementById("pause-btn").onclick = () => {
+        showDialog("pause-popup", "#pause-actions button");
+    };
 
     // savings card
     const savingsCard = document.querySelector(".savings-card");
