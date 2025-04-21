@@ -168,7 +168,16 @@ export class GameAPI {
         const bond = this.bonds[index];
         if (!bond || bond.redeemed) throw new Error("Invalid bond.");
 
-        const payout = this.calculateBondValue(bond);
+        let payout = this.calculateBondValue(bond);
+
+        if (this.getBondProgress(bond) < 1) {
+            payout *= 0.9;
+            showNotification("Redeemed bond early: recieved 90% of bond value.", "success", 4000);
+        } else {
+            showNotification("Redeemed bond successfully!", "success");
+        }
+
+
         this.totalBondProfit += payout - bond.principal;
 
         this.setCash(this.cash + payout);

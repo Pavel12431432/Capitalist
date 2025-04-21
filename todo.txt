@@ -1,4 +1,2 @@
-allow redeeming bonds early
-
 ?add more data
 ?scale down for smaller screens

@@ -4,7 +4,7 @@ let quarterTimeoutId = null;
 let paused = false;
 let elapsedAtPause = 0;
 
-const tickTime = 10_000;
+const tickTime = 6000;
 
 // Called once game is allowed to tick into the next quarter
 function onQuarterEnd() {

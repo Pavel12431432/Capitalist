@@ -350,14 +350,6 @@ function renderBonds(bonds) {
         wrapper.appendChild(canvas);
 
         canvas.style.cursor = "pointer"; // always pointer for UX
-        canvas.addEventListener("click", () => {
-            try {
-                game.redeemBond(index); // this throws if not matured
-                updateUI();
-            } catch (err) {
-                showNotification(err.message, "error"); // "Bond not matured yet." etc.
-            }
-        });
 
         container.appendChild(wrapper);
 
@@ -369,18 +361,16 @@ function renderBonds(bonds) {
         label.style.pointerEvents = "auto";
         label.style.userSelect = "none";
 
-        if (progress >= 1) {
-            label.style.cursor = "pointer";
-            label.addEventListener("click", (e) => {
-                e.stopPropagation();
-                try {
-                    game.redeemBond(index);
-                    updateUI();
-                } catch (err) {
-                    showNotification(err.message, "error");
-                }
-            });
-        }
+        label.style.cursor = "pointer";
+        label.addEventListener("click", (e) => {
+            e.stopPropagation();
+            try {
+                game.redeemBond(index);
+                updateUI();
+            } catch (err) {
+                showNotification(err.message, "error");
+            }
+        });
 
         if (progress >= 1) {
             wrapper.classList.add("bond-bob");
